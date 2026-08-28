@@ -27,7 +27,7 @@ on:
       DATABASE_URL:
         description: "MongoDB database URL"
         required: true
-
+      
 jobs:
   deploy:
     runs-on: ubuntu-latest
