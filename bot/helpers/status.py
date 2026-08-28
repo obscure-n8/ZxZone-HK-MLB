@@ -1,65 +1,63 @@
 import time
 import psutil
-from typing import Dict, Optional
+from typing import Dict, Optional, List
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.config import Config
 from bot.helpers.progress import progress_helper
 
 class StatusView:
-    """Bot task status view system"""
+    """Bot task status view with pagination"""
     
     def __init__(self):
         self.active_tasks = {}
-        self.task_history = []
+        self.page_size = 3  # 3 tasks per page
+        self.max_pages = 4  # Max 4 pages
+        self.max_tasks = 12  # Total 12 tasks
         
-    async def create_status_view(
+    def get_pagination_keyboard(self, task_id: str, page: int = 1, total_pages: int = 1) -> InlineKeyboardMarkup:
+        """Get pagination keyboard"""
+        buttons = []
+        
+        # Refresh and Cancel row
+        buttons.append([
+            InlineKeyboardButton("♻️ Refresh", callback_data=f"refresh_{task_id}_{page}"),
+            InlineKeyboardButton("❌ Cancel", callback_data=f"cancel_{task_id}")
+        ])
+        
+        # Pagination row
+        nav_buttons = []
+        if page > 1:
+            nav_buttons.append(InlineKeyboardButton("⬅️ Prev", callback_data=f"page_{task_id}_{page-1}"))
+        else:
+            nav_buttons.append(InlineKeyboardButton("|||", callback_data="noop"))
+            
+        nav_buttons.append(InlineKeyboardButton(f"📄 {page}/{total_pages}", callback_data="noop"))
+        
+        if page < total_pages:
+            nav_buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"page_{task_id}_{page+1}"))
+        else:
+            nav_buttons.append(InlineKeyboardButton("|||", callback_data="noop"))
+            
+        buttons.append(nav_buttons)
+        
+        return InlineKeyboardMarkup(buttons)
+        
+    async def create_multi_task_status(
         self,
         task_id: str,
-        file_name: str,
-        total_size: int,
-        user_name: str,
-        mode: str = "Leech"
-    ) -> str:
-        """Create status view message"""
+        tasks: List[Dict],
+        page: int = 1
+    ) -> tuple:
+        """Create multi-task status view with pagination"""
         
-        status_text = f"""
-**{Config.BOT_USERNAME}**
-┌ **ZxZone-HK-MLB**
-└ `/leech1 {task_id}`
-
-▍ **Powered By Zonexus Hub** ❞
-
-1. `{file_name}`
-┌ **Task By {user_name}**
-│ [oooooooooo] 0.0%
-│ **Status** : Starting
-│ **Total** : {progress_helper.format_size(total_size)} | **Done** : 0 B
-│ **Speed** : 0 B/s | **ETA** : 0s
-│ **Engine** : Aria2 v1.37.0 | **Mode** : `#{mode}`
-> **Stop** : `/c_{task_id}`
-
-⬢ **BOT STATS**
-┌ **CPU** : 0% | **RAM** : 0%
-└ **FREE** : 0 B
-"""
-        return status_text
+        total_tasks = len(tasks)
+        total_pages = min(self.max_pages, (total_tasks + self.page_size - 1) // self.page_size)
+        page = max(1, min(page, total_pages))
         
-    async def update_status_view(
-        self,
-        task_id: str,
-        file_name: str,
-        total_size: int,
-        downloaded: int,
-        user_name: str,
-        mode: str = "Leech",
-        status: str = "Downloading"
-    ) -> str:
-        """Update status view with progress"""
+        start_idx = (page - 1) * self.page_size
+        end_idx = min(start_idx + self.page_size, total_tasks)
+        page_tasks = tasks[start_idx:end_idx]
         
-        percentage = (downloaded / total_size) * 100 if total_size > 0 else 0
-        speed = downloaded / 2  # Example calculation
-        eta = (total_size - downloaded) / speed if speed > 0 else 0
-        
-        progress_bar = progress_helper.get_progress_bar(percentage)
         system = progress_helper.get_system_stats()
         
         status_text = f"""
@@ -69,86 +67,34 @@ class StatusView:
 
 ▍ **Powered By Zonexus Hub** ❞
 
-1. `{file_name}`
-┌ **Task By {user_name}**
-│ {progress_bar} {percentage:.1f}%
-│ **Status** : {status}
-│ **Total** : {progress_helper.format_size(total_size)} | **Done** : {progress_helper.format_size(downloaded)}
-│ **Speed** : {progress_helper.format_speed(speed)} | **ETA** : {progress_helper.format_eta(eta)}
-│ **Engine** : Aria2 v1.37.0 | **Mode** : `#{mode}`
-> **Stop** : `/c_{task_id}`
+📊 **Active Tasks:** {total_tasks}/12
+📄 **Page:** {page}/{total_pages}
 
+"""
+        
+        for i, task in enumerate(page_tasks, start_idx + 1):
+            percentage = task.get('percentage', 0)
+            progress_bar = progress_helper.get_progress_bar(percentage)
+            
+            status_text += f"""
+{i}. `{task.get('file_name', 'Unknown')}`
+┌ **Task By {task.get('user_name', 'User')}**
+│ {progress_bar} {percentage:.1f}%
+│ **Status** : {task.get('status', 'Processing')}
+│ **Total** : {task.get('total_size_str', '0 B')} | **Done** : {task.get('done_size_str', '0 B')}
+│ **Speed** : {task.get('speed_str', '0 B/s')} | **ETA** : {task.get('eta_str', '0s')}
+│ **Mode** : `#{task.get('mode', 'Leech')}`
+> **Stop** : `/c_{task.get('task_id', '')}`
+
+"""
+        
+        status_text += f"""
 ⬢ **BOT STATS**
 ┌ **CPU** : {system['cpu']}% | **RAM** : {system['ram']}%
 └ **FREE** : {system['free_disk']}
 """
-        return status_text
         
-    async def create_upload_status(
-        self,
-        task_id: str,
-        file_name: str,
-        total_size: int,
-        uploaded: int,
-        user_name: str
-    ) -> str:
-        """Create upload status view"""
-        
-        percentage = (uploaded / total_size) * 100 if total_size > 0 else 0
-        progress_bar = progress_helper.get_progress_bar(percentage)
-        system = progress_helper.get_system_stats()
-        
-        status_text = f"""
-**{Config.BOT_USERNAME}**
-┌ **ZxZone-HK-MLB**
-└ `/leech1 {task_id}`
-
-▍ **Powered By Zonexus Hub** ❞
-
-1. `{file_name}`
-┌ **Task By {user_name}**
-│ {progress_bar} {percentage:.1f}%
-│ **Status** : Uploading
-│ **Total** : {progress_helper.format_size(total_size)} | **Done** : {progress_helper.format_size(uploaded)}
-│ **Engine** : Aria2 v1.37.0 | **Mode** : `#Leech`
-> **Stop** : `/c_{task_id}`
-
-⬢ **BOT STATS**
-┌ **CPU** : {system['cpu']}% | **RAM** : {system['ram']}%
-└ **FREE** : {system['free_disk']}
-"""
-        return status_text
-        
-    async def create_complete_status(
-        self,
-        task_id: str,
-        file_name: str,
-        file_size: int,
-        user_name: str,
-        mode: str = "Leech"
-    ) -> str:
-        """Create completion status view"""
-        
-        status_text = f"""
-**{Config.BOT_USERNAME}**
-┌ **ZxZone-HK-MLB**
-└ `/leech1 {task_id}`
-
-▍ **Powered By Zonexus Hub** ❞
-
-1. `{file_name}`
-┌ **Task By {user_name}**
-│ [●●●●●●●●●●] 100.0%
-│ **Status** : Completed
-│ **Total** : {progress_helper.format_size(file_size)} | **Done** : {progress_helper.format_size(file_size)}
-│ **Engine** : Aria2 v1.37.0 | **Mode** : `#{mode}`
-
-✅ **Task Completed Successfully!**
-
-⬢ **BOT STATS**
-┌ **CPU** : {psutil.cpu_percent()}% | **RAM** : {psutil.virtual_memory().percent}%
-└ **FREE** : {progress_helper.format_size(psutil.disk_usage('/').free)}
-"""
-        return status_text
+        keyboard = self.get_pagination_keyboard(task_id, page, total_pages)
+        return status_text, keyboard
 
 status_view = StatusView()
