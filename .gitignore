@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Environment
+.env
+config.env
+*.env
+!.env.example
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+data/logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Bot specific
+downloads/
+encode/
+thumbnails/
+sessions/
+data/
+config/rclone.conf
+config/cookies.txt
+config/token.pickle
+
+# Docker
+docker-compose.override.yml
+
+# Pyrogram
+*.session
+*.session-journal
+
+# Heroku
+Procfile
