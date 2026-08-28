@@ -1,0 +1,59 @@
+name: Deploy ZxZone-HK-MLB to Heroku
+
+on:
+  workflow_dispatch:
+    inputs:
+      HEROKU_APP_NAME:
+        description: "Heroku App name"
+        required: true
+      HEROKU_API_KEY:
+        description: "Heroku API key"
+        required: true
+      HEROKU_EMAIL:
+        description: "Heroku email address"
+        required: true
+      BOT_TOKEN:
+        description: "Telegram bot token"
+        required: true
+      OWNER_ID:
+        description: "Owner's telegram ID"
+        required: true
+      API_ID:
+        description: "Telegram API ID from https://my.telegram.org/"
+        required: true
+      API_HASH:
+        description: "Telegram HASH from https://my.telegram.org/"
+        required: true
+      DATABASE_URL:
+        description: "MongoDB database URL"
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Deploy Branch
+        uses: actions/checkout@v4
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Deploy Repo to Heroku
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{inputs.HEROKU_API_KEY}}
+          heroku_app_name: ${{inputs.HEROKU_APP_NAME}}
+          heroku_email: ${{inputs.HEROKU_EMAIL}}
+          usedocker: true
+          docker_heroku_process_type: web
+          stack: "container"
+        env:
+          BOT_TOKEN: ${{inputs.BOT_TOKEN}}
+          OWNER_ID: ${{inputs.OWNER_ID}}
+          API_ID: ${{inputs.API_ID}}
+          API_HASH: ${{inputs.API_HASH}}
+          DATABASE_URL: ${{inputs.DATABASE_URL}}
+          UPDATE_CHANNEL: "https://t.me/zxzoneupdates"
+          REPO_LINK: "https://github.com/obscure-n8/ZxZone-HK-MLB"
+          PORT: "8080"
