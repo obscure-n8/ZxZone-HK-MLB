@@ -39,6 +39,12 @@ jobs:
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
 
+      - name: Set Heroku Stack to Container
+        run: |
+          heroku stack:set container --app ${{inputs.HEROKU_APP_NAME}}
+        env:
+          HEROKU_API_KEY: ${{inputs.HEROKU_API_KEY}}
+
       - name: Deploy Repo to Heroku
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
@@ -48,7 +54,16 @@ jobs:
           usedocker: true
           docker_heroku_process_type: web
           stack: "container"
+          region: "us"
         env:
+          HD_BOT_TOKEN: ${{inputs.BOT_TOKEN}}
+          HD_OWNER_ID: ${{inputs.OWNER_ID}}
+          HD_API_ID: ${{inputs.API_ID}}
+          HD_API_HASH: ${{inputs.API_HASH}}
+          HD_DATABASE_URL: ${{inputs.DATABASE_URL}}
+          HD_UPDATE_CHANNEL: "https://t.me/zxzoneupdates"
+          HD_REPO_LINK: "https://github.com/obscure-n8/ZxZone-HK-MLB"
+          HD_PORT: "8080"
           BOT_TOKEN: ${{inputs.BOT_TOKEN}}
           OWNER_ID: ${{inputs.OWNER_ID}}
           API_ID: ${{inputs.API_ID}}
