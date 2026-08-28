@@ -6,9 +6,23 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DEBIAN_FRONTEND=noninteractive \
     PORT=8080
 
+# Enable non-free components for unrar
+RUN echo "deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware" > /etc/apt/sources.list.d/debian.sources && \
+    echo "deb http://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list.d/debian.sources && \
+    echo "deb http://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list.d/debian.sources
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget curl git ffmpeg unzip unrar p7zip-full p7zip-rar \
-    procps net-tools ca-certificates aria2 \
+    wget \
+    curl \
+    git \
+    ffmpeg \
+    unzip \
+    unrar \
+    p7zip-full \
+    procps \
+    net-tools \
+    ca-certificates \
+    aria2 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip \
