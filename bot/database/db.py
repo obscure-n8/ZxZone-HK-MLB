@@ -3,19 +3,7 @@ from bot.config import Config
 
 class Database:
     def __init__(self):
-        # MongoDB Atlas SSL Fix
-        self.client = motor.motor_asyncio.AsyncIOMotorClient(
-            Config.DATABASE_URL,
-            tls=True,
-            tlsAllowInvalidCertificates=True,
-            tlsAllowInvalidHostnames=True,
-            serverSelectionTimeoutMS=5000,
-            connectTimeoutMS=10000,
-            socketTimeoutMS=20000,
-            retryWrites=True,
-            w='majority',
-            appname='ZxZone-HK-MLB'
-        )
+        self.client = motor.motor_asyncio.AsyncIOMotorClient(Config.DATABASE_URL)
         self.db = self.client["zxzone_hk_mlb"]
         self.users = self.db["users"]
         self.tasks = self.db["tasks"]
