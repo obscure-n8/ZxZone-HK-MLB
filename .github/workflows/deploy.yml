@@ -72,3 +72,23 @@ jobs:
           UPDATE_CHANNEL: "https://t.me/zxzoneupdates"
           REPO_LINK: "https://github.com/obscure-n8/ZxZone-HK-MLB"
           PORT: "8080"
+
+      - name: Release Container on Heroku
+        run: |
+          heroku container:release web --app ${{inputs.HEROKU_APP_NAME}}
+        env:
+          HEROKU_API_KEY: ${{inputs.HEROKU_API_KEY}}
+
+      - name: Scale Web Dyno
+        run: |
+          heroku ps:scale web=1 --app ${{inputs.HEROKU_APP_NAME}}
+        env:
+          HEROKU_API_KEY: ${{inputs.HEROKU_API_KEY}}
+
+      - name: Verify Deployment
+        run: |
+          echo "Waiting for dyno to start..."
+          sleep 15
+          heroku ps --app ${{inputs.HEROKU_APP_NAME}}
+        env:
+          HEROKU_API_KEY: ${{inputs.HEROKU_API_KEY}}
