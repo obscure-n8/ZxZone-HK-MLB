@@ -1,12 +1,12 @@
 # ZxZone-HK-MLB — Heroku Optimized Telegram Mirror & Leech Bot
 
-The Most Powerful Heroku-Focused Mirror & Leech Bot with 180+ Features.
+The Most Powerful Heroku-Focused Mirror & Leech Bot with 100+ Features, Stealth Protection, and 24/7 Uptime.
 
 ---
 
 ## Overview
 
-ZxZone-HK-MLB is a Heroku-optimized Telegram Mirror & Leech Bot. It includes all powerful features from ZxZone-MLB, specifically tuned for Heroku deployment with 24/7 uptime, auto-optimization, and anti-sleep system.
+ZxZone-HK-MLB is specifically optimized for Heroku deployment. It includes stealth protection to avoid detection, anti-ban system, keep-alive technology, and all powerful features for mirroring and leeching.
 
 ---
 
@@ -14,31 +14,22 @@ ZxZone-HK-MLB is a Heroku-optimized Telegram Mirror & Leech Bot. It includes all
 
 ### Download System
 - Direct Links, Torrents, Magnets
-- M3U8, Icc.Tv, Viking Files
+- M3U8 Streams, Icc.Tv, Viking Files
 - Mega, Gofile, Pixeldrain
-- YouTube, Instagram, TikTok
-- Google Drive, MediaFire
+- Google Drive, YouTube
 - JDownloader (1000+ sites)
 
 ### Upload System
 - Telegram (Document/Video/Audio)
-- Google Drive, Team Drive
 - Rclone (50+ clouds)
-- Dump Channel
-- HD Thumbnail Auto Generation
-- AI Caption Generation
+- Google Drive
+- 1080p HD Thumbnail Auto Generation
+- Auto Split (2GB/4GB)
 
 ### Video Tools
 - Video Merge, Convert, Encode
-- Multi-Resolution, HardSub
-- Watermark, Aspect Ratio
+- Multi-Resolution, HardSub, Watermark
 - Audio Extract, Video Compress
-
-### User Management
-- Premium System
-- Session String (4GB Split)
-- Sudo/Admin/Owner Panel
-- Ban/Mute System
 
 ### Settings
 - 15 Pages Config Variables
@@ -46,33 +37,62 @@ ZxZone-HK-MLB is a Heroku-optimized Telegram Mirror & Leech Bot. It includes all
 - Private Files Management
 - JD Account Management
 
-### Security
-- NSFW Detection
-- Content Filter
-- Rate Limiting
-- Permission System
+### Heroku Stealth Protection
+- Detection Evasion
+- Anti-Ban System
+- Process Rotation
+- Random User Agents
+- Header Hiding
+- Rate Limit Protection
 
----
-
-## Heroku Specific Features
-
-- 24/7 Keep Alive System
-- Anti-Sleep Technology
-- Auto Restart on Crash
-- Memory Optimization
+### Heroku Optimization
+- 24/7 Keep Alive
+- Auto Restart
+- Memory Optimizer
+- Smart Cache
 - Lazy Loading
-- Auto Environment Detection
-- Speed Optimization
+- Speed Booster
 
 ---
 
-## Deployment
+## Heroku Deploy Guide
 
-### Heroku Deploy
+### Method 1: GitHub Actions (Recommended)
 
-Click the deploy button or use Heroku CLI:
+1. Go to your GitHub repo
+2. Click on **Actions** tab
+3. Select **"Deploy ZxZone-HK-MLB to Heroku"**
+4. Click **"Run workflow"** button
+5. Fill in the inputs:
+   - HEROKU_APP_NAME: Your app name (e.g., zxzonemlb)
+   - HEROKU_API_KEY: From Heroku account settings
+   - HEROKU_EMAIL: Your Heroku email
+   - BOT_TOKEN: From @BotFather
+   - OWNER_ID: Your Telegram ID
+   - API_ID: From my.telegram.org
+   - API_HASH: From my.telegram.org
+   - DATABASE_URL: MongoDB connection string
+6. Click **"Run workflow"**
+7. Wait for deployment to complete
+
+### Method 2: Heroku CLI
 
 ```bash
-heroku create your-bot-name
+# Login
+heroku login
+
+# Create app
+heroku create your-app-name
+
+# Set config vars
+heroku config:set BOT_TOKEN=your_token
+heroku config:set API_ID=your_api_id
+heroku config:set API_HASH=your_api_hash
+heroku config:set OWNER_ID=your_id
+heroku config:set DATABASE_URL=your_mongodb_url
+
+# Deploy
 git push heroku main
-heroku ps:scale web=1 worker=1
+
+# Start web dyno
+heroku ps:scale web=1
