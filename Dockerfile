@@ -7,9 +7,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8080
 
 # Enable non-free components for unrar
-RUN echo "deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware" > /etc/apt/sources.list.d/debian.sources && \
-    echo "deb http://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list.d/debian.sources && \
-    echo "deb http://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list.d/debian.sources
+RUN if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
+        sed -i 's/Components: main/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources; \
+    else \
+        sed -i 's/main/main contrib non-free non-free-firmware/g' /etc/apt/sources.list; \
+    fi
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
@@ -17,7 +19,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     ffmpeg \
     unzip \
-    unrar \
     p7zip-full \
     procps \
     net-tools \
@@ -25,12 +26,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     aria2 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install unrar separately (non-free)
+RUN apt-get update && apt-get install -y --no-install-recommends unrar || true \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install rclone (fixed URL)
 RUN curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip \
     && unzip rclone-current-linux-amd64.zip \
     && cd rclone-*-linux-amd64 \
     && cp rclone /usr/local/bin/ \
     && chmod 755 /usr/local/bin/rclone \
-    && cd .. && rm -rf rclone-*
+    && cd .. \
+    && rm -rf rclone-current-linux-amd64.zip rclone-*-linux-amd64
 
 WORKDIR /app
 
