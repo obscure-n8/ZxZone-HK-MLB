@@ -1,0 +1,90 @@
+{
+  "name": "ZxZone-HK-MLB",
+  "description": "Heroku Optimized Telegram Mirror & Leech Bot - 180+ Features, 24/7 Uptime, Powered by Zonexus Hub",
+  "repository": "https://github.com/obscure-n8/ZxZone-HK-MLB",
+  "logo": "https://telegra.ph/file/your-logo.png",
+  "keywords": [
+    "telegram",
+    "bot",
+    "mirror",
+    "leech",
+    "torrent",
+    "heroku",
+    "python"
+  ],
+  "env": {
+    "BOT_TOKEN": {
+      "description": "Telegram Bot Token from @BotFather",
+      "required": true
+    },
+    "API_ID": {
+      "description": "Telegram API ID from my.telegram.org",
+      "required": true
+    },
+    "API_HASH": {
+      "description": "Telegram API Hash from my.telegram.org",
+      "required": true
+    },
+    "OWNER_ID": {
+      "description": "Your Telegram User ID",
+      "required": true
+    },
+    "BOT_USERNAME": {
+      "description": "Your Bot Username (without @)",
+      "required": true
+    },
+    "DATABASE_URL": {
+      "description": "MongoDB Database URL",
+      "required": true
+    },
+    "REDIS_URL": {
+      "description": "Redis URL (optional)",
+      "required": false,
+      "value": "redis://localhost:6379"
+    },
+    "UPDATE_CHANNEL": {
+      "description": "Update Channel Link",
+      "required": false,
+      "value": "https://t.me/zxzoneupdates"
+    },
+    "REPO_LINK": {
+      "description": "Repository Link",
+      "required": false,
+      "value": "https://github.com/obscure-n8/ZxZone-HK-MLB"
+    },
+    "MAX_TASKS_PER_USER": {
+      "description": "Maximum tasks per user",
+      "required": false,
+      "value": "3"
+    },
+    "MAX_TOTAL_TASKS": {
+      "description": "Maximum total tasks (Heroku optimized)",
+      "required": false,
+      "value": "25"
+    },
+    "QUEUE_LIMIT": {
+      "description": "Queue limit (Heroku optimized)",
+      "required": false,
+      "value": "10"
+    },
+    "DEFAULT_UPLOAD_MODE": {
+      "description": "Default upload mode",
+      "required": false,
+      "value": "document"
+    },
+    "PORT": {
+      "description": "Port for web server",
+      "required": false,
+      "value": "8080"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+    }
+  ],
+  "stack": "container"
+}
